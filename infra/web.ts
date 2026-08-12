@@ -1,7 +1,6 @@
 // oxlint-disable typescript/triple-slash-reference
 /// <reference path="../.sst/platform/config.d.ts" />
 import { eventsRouter } from "./events";
-import { zero } from "./zero";
 
 export const organizationAssetsBucket = new sst.aws.Bucket("OrganizationAssets", {
   access: "cloudfront",
@@ -21,7 +20,7 @@ new sst.aws.StaticSite("Web", {
     output: "dist",
   },
   environment: {
-    VITE_ZERO_URL: zero.url,
+    VITE_ZERO_URL: $dev ? "http://localhost:4848" : "https://zero.lydie.co",
     VITE_API_URL: $dev ? "http://localhost:3001" : "https://api.lydie.co",
     VITE_YJS_SERVER_URL: $dev ? "ws://localhost:3001/yjs" : "wss://api.lydie.co/yjs",
     VITE_ASSETS_DOMAIN: assetsRouter.url,

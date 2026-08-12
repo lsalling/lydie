@@ -1,6 +1,12 @@
 ---
 export const prerender = false;
 
+import { BLOG_ENABLED } from "../../config/features";
+
+if (!BLOG_ENABLED) {
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
 Astro.response.headers.set(
   "Cache-Control",
   "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",

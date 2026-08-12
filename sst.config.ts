@@ -19,10 +19,15 @@ export default $config({
   async run() {
     await import("./infra/onboarding");
     await import("./infra/workspace-export");
-    await import("./infra/backend");
     await import("./infra/web");
-    await import("./infra/zero");
     await import("./infra/events");
+    await import("./infra/email");
+
+    // Keep deployed environments dormant unless the always-on services are explicitly enabled.
+    if ($dev || process.env.ENABLE_SERVICES === "true") {
+      await import("./infra/backend");
+      await import("./infra/zero");
+    }
     return {};
   },
 });

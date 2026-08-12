@@ -1,11 +1,6 @@
-import {
-  db,
-  templateCategoryAssignmentsTable,
-  templateFaqsTable,
-  templatesTable,
-} from "@lydie/database";
 import { asc, desc, eq, inArray } from "drizzle-orm";
 
+import { TEMPLATE_MARKETPLACE_ENABLED } from "../config/features";
 import { getCategoriesFromDb, type Category } from "./categories";
 
 export type TemplateDocument = {
@@ -48,6 +43,11 @@ let allTemplatesCache: Template[] | null = null;
 let allTemplatesCachePromise: Promise<Template[]> | null = null;
 
 export async function getTemplate(slug: string): Promise<Template | undefined> {
+  if (!TEMPLATE_MARKETPLACE_ENABLED) return undefined;
+
+  const { db, templateCategoryAssignmentsTable, templateFaqsTable, templatesTable } =
+    await import("@lydie/database");
+
   const [template] = await db
     .select()
     .from(templatesTable)
@@ -93,6 +93,11 @@ export async function getTemplate(slug: string): Promise<Template | undefined> {
 }
 
 export async function getAllTemplates(): Promise<Template[]> {
+  if (!TEMPLATE_MARKETPLACE_ENABLED) return [];
+
+  const { db, templateCategoryAssignmentsTable, templateFaqsTable, templatesTable } =
+    await import("@lydie/database");
+
   // Return cached result if available
   if (allTemplatesCache) {
     return allTemplatesCache;
@@ -203,9 +208,12 @@ const templatesBySlugCache = new Map<string, Template>();
  * This is more performant than calling getTemplate individually for each slug.
  */
 export async function getTemplatesBySlugs(slugs: string[]): Promise<Template[]> {
-  if (slugs.length === 0) {
+  if (!TEMPLATE_MARKETPLACE_ENABLED || slugs.length === 0) {
     return [];
   }
+
+  const { db, templateCategoryAssignmentsTable, templateFaqsTable, templatesTable } =
+    await import("@lydie/database");
 
   // Check which templates are already cached
   const cachedTemplates: Template[] = [];
@@ -319,9 +327,12 @@ export async function getTemplatesBySlugs(slugs: string[]): Promise<Template[]> 
  * This is more performant than calling getTemplate individually for each ID.
  */
 export async function getTemplatesByIds(ids: string[]): Promise<Template[]> {
-  if (ids.length === 0) {
+  if (!TEMPLATE_MARKETPLACE_ENABLED || ids.length === 0) {
     return [];
   }
+
+  const { db, templateCategoryAssignmentsTable, templateFaqsTable, templatesTable } =
+    await import("@lydie/database");
 
   // Check which templates are already cached
   const cachedTemplates: Template[] = [];

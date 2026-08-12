@@ -1,3 +1,4 @@
+import { BLOG_ENABLED } from "../config/features";
 import { collections, getCollectionDocuments } from "../utils/lydie-client";
 
 export type BlogPost = {
@@ -14,7 +15,7 @@ export type BlogPost = {
  * Returns posts in the order requested (missing posts are filtered out).
  */
 export async function getBlogPostsBySlugs(slugs: string[]): Promise<BlogPost[]> {
-  if (slugs.length === 0) {
+  if (!BLOG_ENABLED || slugs.length === 0) {
     return [];
   }
 

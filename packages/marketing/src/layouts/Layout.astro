@@ -5,6 +5,10 @@ import { Container } from "../components/Container";
 import { DiscordIcon, GitHubIcon } from "../components/icons";
 import { Header } from "../components/Header";
 import { Logo } from "../components/Logo";
+import {
+  BLOG_ENABLED,
+  TEMPLATE_MARKETPLACE_ENABLED,
+} from "../config/features";
 import "../styles/tailwind.css";
 
 export interface Props {
@@ -21,10 +25,7 @@ const linkGroups = [
   {
     title: "General",
     links: [
-      {
-        href: "/blog",
-        label: "Blog",
-      },
+      ...(BLOG_ENABLED ? [{ href: "/blog", label: "Blog" }] : []),
       {
         href: "/about",
         label: "About",
@@ -67,10 +68,9 @@ const linkGroups = [
   {
     title: "Resources",
     links: [
-      {
-        label: "Templates",
-        href: "/templates",
-      },
+      ...(TEMPLATE_MARKETPLACE_ENABLED
+        ? [{ label: "Templates", href: "/templates" }]
+        : []),
       {
         label: "Compare",
         href: "/compare",

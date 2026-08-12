@@ -10,11 +10,6 @@ declare module "sst" {
       "type": "sst.aws.Router"
       "url": string
     }
-    "Backend": {
-      "service": string
-      "type": "sst.aws.Service"
-      "url": string
-    }
     "Email": {
       "configSet": string
       "sender": string
@@ -47,14 +42,6 @@ declare module "sst" {
     "WorkspaceExports": {
       "name": string
       "type": "sst.aws.Bucket"
-    }
-    "Zero": {
-      "service": string
-      "type": "sst.aws.Service"
-      "url": string
-    }
-    "vpc": {
-      "type": "sst.aws.Vpc"
     }
   }
 }

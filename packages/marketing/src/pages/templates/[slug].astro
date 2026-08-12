@@ -15,8 +15,11 @@ import { TemplateViewer } from "../../components/templates/TemplateViewer";
 import TemplateThumbnail from "../../components/templates/TemplateThumbnail.astro";
 import { getAllTemplates, type Template } from "../../data/templates";
 import type { Category } from "../../data/categories";
-import { findRelatedTemplates } from "@lydie/core/embedding/search";
-import { serializeToHTML } from "@lydie/core/content";
+import { TEMPLATE_MARKETPLACE_ENABLED } from "../../config/features";
+
+if (!TEMPLATE_MARKETPLACE_ENABLED) {
+  return new Response(null, { status: 404 });
+}
 
 const { slug } = Astro.params;
 
@@ -32,8 +35,15 @@ const templateName = template.name;
 const categories = template.categories;
 const teaser = template.teaser || template.description || "";
 
-let relatedTemplates: Awaited<ReturnType<typeof findRelatedTemplates>> = [];
+let relatedTemplates: Array<{
+  id: string;
+  name: string;
+  slug: string;
+  teaser: string | null;
+  thumbnailSrc: string | null;
+}> = [];
 try {
+  const { findRelatedTemplates } = await import("@lydie/core/embedding/search");
   relatedTemplates = await findRelatedTemplates(template.id, 3);
 } catch (error) {
   console.error("Failed to fetch related templates:", error);

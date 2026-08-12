@@ -1,6 +1,4 @@
 ---
-import { findRelatedTemplates } from "@lydie/core/embedding/search";
-
 import TemplateThumbnail from "@/components/templates/TemplateThumbnail.astro";
 import { TemplateViewer } from "@/components/templates/TemplateViewer";
 import { getTemplatesByIds } from "@/data/templates";
@@ -47,6 +45,7 @@ if (template) {
     }));
   } else {
     try {
+      const { findRelatedTemplates } = await import("@lydie/core/embedding/search");
       const relatedTemplates = await findRelatedTemplates(template.id, 3);
       otherTemplateCards = relatedTemplates.map((item) => ({
         id: item.id,

@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
+import { API_ENABLED, BLOG_ENABLED } from "../config/features";
 import { Container } from "./Container";
 import { Button } from "./generic/Button";
 import { Logo } from "./Logo";
@@ -12,10 +13,7 @@ const links = [
     href: "/",
     label: "Home",
   },
-  {
-    href: "/blog",
-    label: "Blog",
-  },
+  ...(BLOG_ENABLED ? [{ href: "/blog", label: "Blog" }] : []),
   {
     href: "/pricing",
     label: "Pricing",
@@ -35,6 +33,8 @@ export function Header() {
   const apiUrl = import.meta.env.PUBLIC_API_URL ?? "https://api.lydie.co";
 
   useEffect(() => {
+    if (!API_ENABLED) return;
+
     const controller = new AbortController();
 
     async function loadAuthState() {
@@ -45,13 +45,10 @@ export function Header() {
           return;
         }
 
-        const response = await fetch(
-          `${apiUrl}/internal/public/auth/get-session`,
-          {
-            credentials: "include",
-            signal: controller.signal,
-          },
-        );
+        const response = await fetch(`${apiUrl}/internal/public/auth/get-session`, {
+          credentials: "include",
+          signal: controller.signal,
+        });
 
         if (!response.ok) {
           return;
@@ -184,7 +181,10 @@ export function Header() {
         )}
       >
         <Container className="flex items-center justify-between">
-          <a href={logoHref} className="flex items-center gap-x-1.5 z-50 relative focus:outline-none">
+          <a
+            href={logoHref}
+            className="flex items-center gap-x-1.5 z-50 relative focus:outline-none"
+          >
             <Logo className="text-gray-950 size-5" />
             <span className="text-lg/0 font-semibold text-gray-800">Lydie</span>
           </a>

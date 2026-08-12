@@ -1,9 +1,21 @@
 import rss from "@astrojs/rss";
 
+import { BLOG_ENABLED } from "../config/features";
 import { SITE_TAGLINE } from "../config/site";
 import { collections, getCollectionDocuments } from "../utils/lydie-client";
 
+export const prerender = true;
+
 export async function GET(context) {
+  if (!BLOG_ENABLED) {
+    return rss({
+      title: "Lydie Blog",
+      description: SITE_TAGLINE,
+      site: context.site,
+      items: [],
+    });
+  }
+
   let posts = [];
 
   try {

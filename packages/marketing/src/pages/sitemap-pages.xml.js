@@ -1,3 +1,4 @@
+import { API_ENABLED, BLOG_ENABLED, TEMPLATE_MARKETPLACE_ENABLED } from "../config/features";
 import { comparisons } from "../data/comparisons";
 import { getAllFeaturePaths } from "../data/features";
 import { integrations } from "../data/integrations";
@@ -7,6 +8,8 @@ import { getAllUseCaseSlugs } from "../data/use-case-definitions";
 import { collections, getCollectionDocumentsWithPaths } from "../utils/lydie-client";
 import { generateUrlEntry, generateSitemap, sitemapHeaders } from "./sitemap-utils.js";
 
+export const prerender = true;
+
 // Static pages to include in sitemap (pages without dynamic registries)
 const staticPages = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
@@ -14,9 +17,13 @@ const staticPages = [
   { path: "/pricing", priority: "0.9", changefreq: "weekly" },
   { path: "/roadmap", priority: "0.6", changefreq: "weekly" },
   { path: "/privacy", priority: "0.3", changefreq: "yearly" },
-  { path: "/blog", priority: "0.8", changefreq: "daily" },
-  { path: "/templates", priority: "0.9", changefreq: "weekly" },
-  { path: "/templates/categories", priority: "0.8", changefreq: "weekly" },
+  ...(BLOG_ENABLED ? [{ path: "/blog", priority: "0.8", changefreq: "daily" }] : []),
+  ...(TEMPLATE_MARKETPLACE_ENABLED
+    ? [
+        { path: "/templates", priority: "0.9", changefreq: "weekly" },
+        { path: "/templates/categories", priority: "0.8", changefreq: "weekly" },
+      ]
+    : []),
   { path: "/features", priority: "0.8", changefreq: "weekly" },
   { path: "/documentation", priority: "0.7", changefreq: "monthly" },
   { path: "/documentation/sdk", priority: "0.6", changefreq: "monthly" },
@@ -105,30 +112,32 @@ export async function GET() {
     );
   }
 
-  // Knowledge base pages (root + articles)
-  try {
-    const { documents } = await getCollectionDocumentsWithPaths(collections.knowledgeBases, {
-      sortBy: "created_at",
-      sortOrder: "asc",
-    });
+  if (API_ENABLED) {
+    // Knowledge base pages (root + articles)
+    try {
+      const { documents } = await getCollectionDocumentsWithPaths(collections.knowledgeBases, {
+        sortBy: "created_at",
+        sortOrder: "asc",
+      });
 
-    for (const doc of documents) {
-      const path = doc.path === "/" ? "/knowledge-bases" : `/knowledge-bases${doc.path}`;
-      const updatedAt = typeof doc.updatedAt === "string" ? doc.updatedAt : null;
-      const createdAt = typeof doc.createdAt === "string" ? doc.createdAt : null;
-      const lastmod = updatedAt || createdAt;
+      for (const doc of documents) {
+        const path = doc.path === "/" ? "/knowledge-bases" : `/knowledge-bases${doc.path}`;
+        const updatedAt = typeof doc.updatedAt === "string" ? doc.updatedAt : null;
+        const createdAt = typeof doc.createdAt === "string" ? doc.createdAt : null;
+        const lastmod = updatedAt || createdAt;
 
-      urls.push(
-        generateUrlEntry({
-          path,
-          priority: doc.path === "/" ? "0.8" : "0.7",
-          changefreq: "monthly",
-          lastmod: lastmod ? new Date(lastmod).toISOString().split("T")[0] : undefined,
-        }),
-      );
+        urls.push(
+          generateUrlEntry({
+            path,
+            priority: doc.path === "/" ? "0.8" : "0.7",
+            changefreq: "monthly",
+            lastmod: lastmod ? new Date(lastmod).toISOString().split("T")[0] : undefined,
+          }),
+        );
+      }
+    } catch (error) {
+      console.error("Error adding knowledge base pages to sitemap:", error);
     }
-  } catch (error) {
-    console.error("Error adding knowledge base pages to sitemap:", error);
   }
 
   const sitemap = generateSitemap(urls);

@@ -1,9 +1,16 @@
+import { BLOG_ENABLED } from "../config/features";
 import { collections, getCollectionDocuments } from "../utils/lydie-client";
 import { generateUrlEntry, generateSitemap, sitemapHeaders } from "./sitemap-utils.js";
 
 const BLOG_POSTS_PER_PAGE = 12;
 
+export const prerender = true;
+
 export async function GET() {
+  if (!BLOG_ENABLED) {
+    return new Response(generateSitemap([]), { headers: sitemapHeaders });
+  }
+
   try {
     const urls = [];
     let cursor;

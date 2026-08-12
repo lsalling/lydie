@@ -1,8 +1,15 @@
+import { TEMPLATE_MARKETPLACE_ENABLED } from "../config/features";
 import { getCategoriesFromDb, flattenCategories } from "../data/categories";
 import { getAllTemplates } from "../data/templates";
 import { generateUrlEntry, generateSitemap, sitemapHeaders } from "./sitemap-utils.js";
 
 export async function GET() {
+  if (!TEMPLATE_MARKETPLACE_ENABLED) {
+    return new Response(generateSitemap([]), {
+      headers: sitemapHeaders,
+    });
+  }
+
   try {
     const [templates, categories] = await Promise.all([getAllTemplates(), getCategoriesFromDb()]);
 

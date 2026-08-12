@@ -19,6 +19,11 @@ import {
 import { getAllTemplates } from "../../../data/templates";
 import TemplateThumbnail from "../../../components/templates/TemplateThumbnail.astro";
 import CategoryThumbnail from "../../../components/templates/CategoryThumbnail.astro";
+import { TEMPLATE_MARKETPLACE_ENABLED } from "../../../config/features";
+
+if (!TEMPLATE_MARKETPLACE_ENABLED) {
+  return new Response(null, { status: 404 });
+}
 
 const { path } = Astro.params;
 const allCategories = await getCategoriesFromDb();

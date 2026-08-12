@@ -10,6 +10,8 @@ import {
 } from "react-aria-components";
 import { twMerge } from "tailwind-merge";
 
+import { CLOUD_APP_ENABLED } from "../../config/features";
+
 const focusRing = cva({
   base: "outline outline-blue-600 outline-offset-2",
   variants: {
@@ -77,6 +79,27 @@ export const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, Bu
   (props, ref) => {
     if (isAnchor(props)) {
       const { className, children, phCapture, ...rest } = props;
+
+      if (!CLOUD_APP_ENABLED && props.href.startsWith("https://app.lydie.co")) {
+        return (
+          <button
+            type="button"
+            disabled
+            className={twMerge(
+              focusRing({ isFocusVisible: false }),
+              styles({
+                intent: props.intent,
+                size: props.size,
+                className,
+              }),
+            )}
+            ref={ref as React.Ref<HTMLButtonElement>}
+          >
+            <ButtonChildren children="Lydie is currently unavailable" size={props.size} />
+          </button>
+        );
+      }
+
       return (
         <a
           {...rest}

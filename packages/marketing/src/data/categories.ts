@@ -1,4 +1,4 @@
-import { db, templateCategoriesTable } from "@lydie/database";
+import { TEMPLATE_MARKETPLACE_ENABLED } from "../config/features";
 
 // Cache for categories to avoid repeated DB queries during build
 let categoriesCache: Category[] | null = null;
@@ -129,6 +129,10 @@ export const getCategoryByPath = (
 };
 
 export async function getCategoriesFromDb(): Promise<Category[]> {
+  if (!TEMPLATE_MARKETPLACE_ENABLED) return categories;
+
+  const { db, templateCategoriesTable } = await import("@lydie/database");
+
   // Return cached result if available
   if (categoriesCache) {
     return categoriesCache;
